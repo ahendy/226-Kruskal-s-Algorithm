@@ -51,39 +51,141 @@ public class MWST{
 	static int MWST(int[][] G){
 		int numVerts = G.length;
 		ListNode toSort = new ListNode(0);
-		ListNode p ;
-		ListNode f;
-		for(int row = 0; row <numVerts/2;row++){
-			for(int column=0; column< numVerts;column++){
+		ListNode p = toSort;;
+		int totalWeight = 0;
+		Vector<UFDS> ufds = new Vector<UFDS>();
+
+
+
+		int count2 = 0; //save pos for diagonal traversal
+		for(int row = 0; row <numVerts;row++){
+			count2++;		//each time we travel down a row, begin column by 1
+			for(int column=count2; column< numVerts;column++){
 				
 				if(G[row][column]>0){
-					p= new ListNode( G[row][column]);
-					toSort = p;
-					toSort = toSort.next;
-					
+					p.next = new ListNode(G[row][column]);		//push to ListNode
+					p = p.next;
+					UFDS u = new UFDS(row,column, G[row][column]);
+					ufds.add(u);
 				}
 				
 			}
 			
 			
 		}
-		printList(toSort);
-		/* Find a minimum weight spanning tree by any method */
-		/* (You may add extra functions if necessary) */
+		//toSort = toSort.next; //bad code but couldnt figure out how to go around
+		//f = null; // other than removing first node created from toSort = newListNode(0)
+		for(UFDS a: ufds){
+			System.out.print("("+ a.x +", "+ a.y+") Weight: " +a.weight);
+
+
+		}
+	 	toSort = removeFront(toSort);	
+		//printList(toSort);
+
+		ListNode sorted = MergeSort(toSort); //sort 
 		
-		/* ... Your code here ... */
-		
-		
-		
-		/* Add the weight of each edge in the minimum weight spanning tree
-		   to totalWeight, which will store the total weight of the tree.
-		*/
-		int totalWeight = 0;
-		/* ... Your code here ... */
+		//printList(sorted);
+
+	/*      *******************************		  */
+	
+	/*      have now sorted  list of edges       */
+		//now must make forests for each node	
+	/*      *******************************		*/
+
+
+	
+
+
 		
 		return totalWeight;
 		
 	}
+
+
+
+
+	public static ListNode removeFront(ListNode head){
+		ListNode f = head;
+		head = head.next;
+		f = null;
+		return head;
+
+
+	}
+
+	public static int listLength(ListNode node){
+		if (node == null)
+			return 0;
+		return 1 + listLength(node.next);
+	}
+
+	public static ListNode addBack(ListNode head, ListNode value){
+		ListNode sorted;
+		if(value == null){
+			return head;
+		}
+		if(head == null){
+			return value;
+
+		}
+		if (head.value<value.value){
+			sorted = new ListNode(head.value, addBack(head.next,value));
+			//sorted.next = addBack(head.next, value);
+			//return sorted;
+		}
+		else{
+			sorted = new ListNode(value.value, addBack(head,value.next));
+			//sorted.next = addBack(head,value.next);
+			//return sorted;
+
+		}
+		return sorted;
+		//rfeturn addBack(head.next, value);
+
+	}
+
+
+	public static ListNode findMid(ListNode head,ListNode end){
+		ListNode mid = head;
+		
+		
+		if (end == null||end.next == null||end.next.next==null){ //end.next.next is required or else null pointers would happen on a few cases.
+			return mid;														// also size n  = 4, middle pointer would be too far.
+		}
+		end = end.next;
+		return findMid(head.next,end.next);			// recursively increment back pointer by 2, front by one making front pointer be at middle.
+
+	}
+
+	public static ListNode MergeSort(ListNode head){
+		
+
+		if(listLength(head)<=1 || head ==null ){
+
+			return head;
+		}
+		
+		ListNode middle = findMid(head,head); 
+		ListNode tail = middle.next; //break from middle pointer.next to make tail		
+		middle.next = null; //middle pointer edits head linked list, breaking it into head nodes
+		
+		ListNode left =  MergeSort(head); //recursively create lists of size one
+		ListNode right = MergeSort(tail); //by continuously splitting in half by findMid
+
+
+
+		//addBack(head,end);
+
+		//addBack(head, end); //addback WORKS
+		//return end;
+		return addBack(left,right);   //originally was listMerge, edited my add to back function to create a sort and merge function
+	}
+	
+
+
+
+
 	public static void printList(ListNode node){
 		if (node == null)
 			System.out.println();
