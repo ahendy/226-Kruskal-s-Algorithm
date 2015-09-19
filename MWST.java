@@ -53,7 +53,7 @@ public class MWST{
 		ListNode toSort = new ListNode(0);
 		ListNode p = toSort;;
 		int totalWeight = 0;
-		Vector<UFDS> ufds = new Vector<UFDS>();
+		Vector<UFDS> ufdsVec = new Vector<UFDS>();
 
 
 
@@ -66,7 +66,7 @@ public class MWST{
 					p.next = new ListNode(G[row][column]);		//push to ListNode
 					p = p.next;
 					UFDS u = new UFDS(row,column, G[row][column]);
-					ufds.add(u);
+					ufdsVec.add(u);
 				}
 				
 			}
@@ -75,11 +75,11 @@ public class MWST{
 		}
 		//toSort = toSort.next; //bad code but couldnt figure out how to go around
 		//f = null; // other than removing first node created from toSort = newListNode(0)
-		for(UFDS a: ufds){
-			System.out.print("("+ a.x +", "+ a.y+") Weight: " +a.weight);
+		//for(UFDS a: ufds){
+			//System.out.print("("+ a.x +", "+ a.y+") Weight: " +a.weight);
 
 
-		}
+		//}
 	 	toSort = removeFront(toSort);	
 		//printList(toSort);
 
@@ -90,10 +90,33 @@ public class MWST{
 	/*      *******************************		  */
 	
 	/*      have now sorted  list of edges       */
-		//now must make forests for each node	
+		//now must make forests for each node
+		//ufds is a vector of UFDS(x,y,weight) x,y are vertices 
+		//ufds also has forest vector	
 	/*      *******************************		*/
 
+	while(listLength(sorted)!= 0){
+		int leastEdge = sorted.value;
+		System.out.println("least edge: "+ leastEdge);
 
+		sorted = removeFront(sorted);
+		for(UFDS a: ufdsVec){
+			if(a.weight == leastEdge&& a.visited ==false && !cycleTest(a)){
+				a.visited = true;
+
+
+
+
+				totalWeight+= leastEdge;
+				break;
+			}
+
+
+
+
+		}
+
+	}
 	
 
 
@@ -103,7 +126,22 @@ public class MWST{
 	}
 
 
+	public static boolean cycleTest(UFDS t){ //true if cycle false if no cycle
+		if(t.forest.contains(t.x) && t.forest.contains(t.y)){
+			return true;
 
+		}if(!t.forest.contains(t.x)) {
+				t.forest.add(t.x);
+				System.out.println("adding t.x: "+ t.x);
+
+		}if(!t.forest.contains(t.y)){
+				t.forest.add(t.y);
+				System.out.println("adding t.y: "+ t.y);	
+		}
+				
+		return false;		
+
+	}
 
 	public static ListNode removeFront(ListNode head){
 		ListNode f = head;
