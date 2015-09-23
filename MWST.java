@@ -53,9 +53,9 @@ public class MWST{
 		ListNode toSort = new ListNode(0);
 		ListNode p = toSort;;
 		int totalWeight = 0;
-		Vector<UFDS> ufdsVec = new Vector<UFDS>();
+		Vector<Edge> edgeVec = new Vector<Edge>();
 
-
+		int sum=0;
 
 		int count2 = 0; //save pos for diagonal traversal
 		for(int row = 0; row <numVerts;row++){
@@ -65,14 +65,16 @@ public class MWST{
 				if(G[row][column]>0){
 					p.next = new ListNode(G[row][column]);		//push to ListNode
 					p = p.next;
-					UFDS u = new UFDS(row,column, G[row][column]);
-					ufdsVec.add(u);
+					Edge u = new Edge(row,column, G[row][column]);
+					sum+=(G[row][column]);
+					edgeVec.add(u);
 				}
 				
 			}
 			
 			
 		}
+		System.out.println("sum: " +sum);
 		//toSort = toSort.next; //bad code but couldnt figure out how to go around
 		//f = null; // other than removing first node created from toSort = newListNode(0)
 		//for(UFDS a: ufds){
@@ -91,22 +93,17 @@ public class MWST{
 	
 	/*      have now sorted  list of edges       */
 		//now must make forests for each node
-		//ufds is a vector of UFDS(x,y,weight) x,y are vertices 
-		//ufds also has forest vector	
+		//edge is a vector of EDGE(x,y,weight) x,y are vertices 
+			
 	/*      *******************************		*/
 
 	while(listLength(sorted)!= 0){
 		int leastEdge = sorted.value;
-		System.out.println("least edge: "+ leastEdge);
+		//System.out.println("least edge: "+ leastEdge);
 
 		sorted = removeFront(sorted);
-		for(UFDS a: ufdsVec){
-			if(a.weight == leastEdge&& a.visited ==false && !cycleTest(a)){
-				a.visited = true;
-
-
-
-
+		for(Edge a: edgeVec){
+			if(a.weight == leastEdge && !cycleTest(a)){
 				totalWeight+= leastEdge;
 				break;
 			}
@@ -124,9 +121,41 @@ public class MWST{
 		return totalWeight;
 		
 	}
+	public static boolean cycleTest(Edge a){
+		if(findSet(a.x)!=findSet(a.y)){
+			System.out.println(findSet(a.x).val+ " "+findSet(a.y).val);
+			union(findSet(a.x),findSet(a.y));
+			
+			return false;
+
+		}
+		return true;
 
 
-	public static boolean cycleTest(UFDS t){ //true if cycle false if no cycle
+
+	}
+
+	public static Vert findSet(Vert a){
+		if(a.parent != a){
+			findSet(a.parent);
+		}
+		//System.out.println("parent: "+a.parent +" current: "+ a+" ");
+		return a.parent;
+
+
+	}
+	public static void union(Vert a, Vert b){
+		if(a.rank<=b.rank){
+			a.parent = b;
+			b.rank+=a.rank;
+		}
+
+		System.out.println(b.val + " "+ a.parent.val);
+	}
+
+	
+
+	/*public static boolean cycleTest(UFDS t){ //true if cycle false if no cycle
 		if(t.forest.contains(t.x) && t.forest.contains(t.y)){
 			return true;
 
@@ -141,7 +170,7 @@ public class MWST{
 				
 		return false;		
 
-	}
+	}*/
 
 	public static ListNode removeFront(ListNode head){
 		ListNode f = head;
@@ -247,6 +276,38 @@ public class MWST{
 			this.value = value;
 			this.next = next;
 		}
+	}
+
+	public static class Edge{
+		public Vert x;
+		public Vert y;
+		public int weight;
+		public Edge(int x,int y,int weight){
+			this.weight = weight;
+			this.x = new Vert(x);
+			this.y = new Vert(y);
+
+			
+		}
+
+	}
+
+	public static class Vert{
+		public Vert parent;
+		public int val;
+		public int rank= 0;
+		public Vert(int val){
+			this.val = val;
+			this.parent = this;
+			
+		}
+		public Vert(int val, Vert parent){
+			this.val = val;
+			this.parent = parent;
+
+
+		}
+
 	}
 		
 	/* main()
