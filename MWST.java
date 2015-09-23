@@ -100,11 +100,15 @@ public class MWST{
 	while(listLength(sorted)!= 0){
 		int leastEdge = sorted.value;
 		//System.out.println("least edge: "+ leastEdge);
-
+		//System.out.print(" "+ edgeVec.size()+" "+ listLength(sorted));
+		printList(sorted);
 		sorted = removeFront(sorted);
+		
 		for(Edge a: edgeVec){
-			if(a.weight == leastEdge && !cycleTest(a)){
-				totalWeight+= leastEdge;
+			if(a.weight == leastEdge){
+				a.visited = true;
+				edgeVec.remove(a);
+				totalWeight+= union(findSet(a.x),findSet(a.y),leastEdge);;
 				break;
 			}
 
@@ -123,8 +127,8 @@ public class MWST{
 	}
 	public static boolean cycleTest(Edge a){
 		if(findSet(a.x)!=findSet(a.y)){
-			System.out.println(findSet(a.x).val+ " "+findSet(a.y).val);
-			union(findSet(a.x),findSet(a.y));
+			//System.out.println(findSet(a.x).val+ " "+findSet(a.y).val);
+			
 			
 			return false;
 
@@ -137,20 +141,34 @@ public class MWST{
 
 	public static Vert findSet(Vert a){
 		if(a.parent != a){
-			findSet(a.parent);
+			a.parent = findSet(a.parent);
 		}
 		//System.out.println("parent: "+a.parent +" current: "+ a+" ");
 		return a.parent;
 
 
 	}
-	public static void union(Vert a, Vert b){
-		if(a.rank<=b.rank){
-			a.parent = b;
-			b.rank+=a.rank;
+	public static int union(Vert a, Vert b, int leastEdge){
+		
+		if(a==b){
+			return 0;
 		}
+		if(a.rank<b.rank){
+			a.parent = b;
+		//	b.rank+=a.rank;
+		} else if (b.rank<a.rank){
+			b.parent = b;
 
-		System.out.println(b.val + " "+ a.parent.val);
+
+		}else{
+			a.parent = b;
+			b.rank = b.rank + 1;
+
+
+		}
+		return leastEdge;
+
+		
 	}
 
 	
@@ -282,6 +300,7 @@ public class MWST{
 		public Vert x;
 		public Vert y;
 		public int weight;
+		public boolean visited = false;
 		public Edge(int x,int y,int weight){
 			this.weight = weight;
 			this.x = new Vert(x);
