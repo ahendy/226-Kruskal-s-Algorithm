@@ -50,10 +50,10 @@ public class MWST{
 	*/
 	static int MWST(int[][] G){
 		int numVerts = G.length;
-		ListNode toSort = new ListNode(0);
+		ListNode toSort = new ListNode(new Edge(0,0,0));
 		ListNode p = toSort;;
 		int totalWeight = 0;
-		Vector<Edge> edgeVec = new Vector<Edge>();
+		
 
 		int sum=0;
 
@@ -63,19 +63,18 @@ public class MWST{
 			for(int column=count2; column< numVerts;column++){
 				
 				if(G[row][column]>0){
-					p.next = new ListNode(G[row][column]);		//push to ListNode
+					p.next = new ListNode(new Edge(row,column, G[row][column]));		//push to ListNode
 					p = p.next;
-					Edge u = new Edge(row,column, G[row][column]);
-					sum+=(G[row][column]);
-					edgeVec.add(u);
+					
 				}
 				
 			}
 			
 			
 		}
+		
 		System.out.println("sum: " +sum);
-		//toSort = toSort.next; //bad code but couldnt figure out how to go around
+		//toSort = toSort.nexxt; //bad code but couldnt figure out how to go around
 		//f = null; // other than removing first node created from toSort = newListNode(0)
 		//for(UFDS a: ufds){
 			//System.out.print("("+ a.x +", "+ a.y+") Weight: " +a.weight);
@@ -83,39 +82,48 @@ public class MWST{
 
 		//}
 	 	toSort = removeFront(toSort);	
-		//printList(toSort);
+		//
 
 		ListNode sorted = MergeSort(toSort); //sort 
 		
-		//printList(sorted);
-
-	/*      *******************************		  */
+		printList(sorted);
+		//sorted now contains a  sorted ListNode of edge objects.
+	ListNode sorted2 = sorted;
 	
-	/*      have now sorted  list of edges       */
-		//now must make forests for each node
-		//edge is a vector of EDGE(x,y,weight) x,y are vertices 
-			
-	/*      *******************************		*/
-
-	while(listLength(sorted)!= 0){
-		int leastEdge = sorted.value;
+	while(sorted!= null){
+		Edge a = sorted.value;
+		int leastEdge = a.weight;
 		//System.out.println("least edge: "+ leastEdge);
 		//System.out.print(" "+ edgeVec.size()+" "+ listLength(sorted));
-		printList(sorted);
-		sorted = removeFront(sorted);
+		//printList(sorted);
+		//sorted = removeFront(sorted);
+		sorted = sorted.next;
+		//for(Edge a: edgeVec){
+			//if(a.weight == leastEdge){
+				//a.visited = true;
+				//edgeVec.remove(a);
+		//if(!cycleTest(a)){
+			
+			//System.out.println(a.x.val);
+			//System.out.println("a.parent.valTWO: "+ a.x.parent.val+ " b.parent.valTWO "+ a.y.parent.val+"\n");
+
+		totalWeight+= union(a.x,a.y,leastEdge); 
+		System.out.println("a.x.parent.val"+ findSet(a.x).parent.val);
+		//}
+	//	System.out.println(totalWeight);	//break;
+	
+		//System.out.println("before2 "+ findSet(a.x).parent.val);
 		
-		for(Edge a: edgeVec){
-			if(a.weight == leastEdge){
-				a.visited = true;
-				edgeVec.remove(a);
-				totalWeight+= union(findSet(a.x),findSet(a.y),leastEdge);;
-				break;
-			}
+		
+		//findSet(a.x).parent = new Vert(69999);
+		//System.out.println(findSet(a.x).val+ " after2 "+findSet(a.x).parent.val);
+
+			//}
 
 
 
 
-		}
+		//}
 
 	}
 	
@@ -127,8 +135,6 @@ public class MWST{
 	}
 	public static boolean cycleTest(Edge a){
 		if(findSet(a.x)!=findSet(a.y)){
-			//System.out.println(findSet(a.x).val+ " "+findSet(a.y).val);
-			
 			
 			return false;
 
@@ -141,31 +147,42 @@ public class MWST{
 
 	public static Vert findSet(Vert a){
 		if(a.parent != a){
+			//System.out.println("parent: "+a.parent.val +" current: "+ a.val +" ");
+			
 			a.parent = findSet(a.parent);
+			System.out.print(a.val+ " ");
 		}
-		//System.out.println("parent: "+a.parent +" current: "+ a+" ");
+
 		return a.parent;
 
 
 	}
-	public static int union(Vert a, Vert b, int leastEdge){
+	public static int union(Vert xr, Vert yr, int leastEdge){
+		Vert a = findSet(xr);
+		Vert b = findSet(yr);
+		Vert c = new Vert(69);
+	/*	if(a.val==3){
+			
+			
+		}
+		else if(a.rank>b.rank){
+			b.parent = a;
+			System.out.println("b.val: "+b.val);
+			
+		} else if (a.rank<b.rank){
+			a.parent = b;
+
+
+		}else if (a.rank == b.rank){
+			a.parent = b;
+			b.rank ++;
+
+		}
+
+	*/	
+		System.out.println("a.val: "+a.val+" a.parent.val: "+ a.parent.parent.val+ " b.parent.val "+ b.parent.val +"\n");
+		a.parent = b;
 		
-		if(a==b){
-			return 0;
-		}
-		if(a.rank<b.rank){
-			a.parent = b;
-		//	b.rank+=a.rank;
-		} else if (b.rank<a.rank){
-			b.parent = b;
-
-
-		}else{
-			a.parent = b;
-			b.rank = b.rank + 1;
-
-
-		}
 		return leastEdge;
 
 		
@@ -214,13 +231,13 @@ public class MWST{
 			return value;
 
 		}
-		if (head.value<value.value){
-			sorted = new ListNode(head.value, addBack(head.next,value));
+		if ( head.value.weight< value.value.weight){
+			sorted = new ListNode( head.value, addBack(head.next,value));
 			//sorted.next = addBack(head.next, value);
 			//return sorted;
 		}
 		else{
-			sorted = new ListNode(value.value, addBack(head,value.next));
+			sorted = new ListNode( value.value, addBack(head,value.next));
 			//sorted.next = addBack(head,value.next);
 			//return sorted;
 
@@ -275,22 +292,22 @@ public class MWST{
 		if (node == null)
 			System.out.println();
 		else{
-			System.out.print(node.value + " ");
+			System.out.print(node.value.weight + " ");
 			printList(node.next);
 		}
 	}
 	public static class ListNode{
-		int value;
+		Edge value;
 		ListNode next;
 		public ListNode(){
 			
 			next = null;
 		}
-		public ListNode(int value){
+		public ListNode(Edge value){
 			this.value = value;
 			this.next = null;
 		}
-		public ListNode(int value, ListNode next){
+		public ListNode(Edge value, ListNode next){
 			this.value = value;
 			this.next = next;
 		}
@@ -300,11 +317,11 @@ public class MWST{
 		public Vert x;
 		public Vert y;
 		public int weight;
-		public boolean visited = false;
-		public Edge(int x,int y,int weight){
+		//public boolean visited = false;
+		public Edge(int a,int b,int weight){
 			this.weight = weight;
-			this.x = new Vert(x);
-			this.y = new Vert(y);
+			this.x = new Vert(a);
+			this.y = new Vert(b);
 
 			
 		}
@@ -312,12 +329,12 @@ public class MWST{
 	}
 
 	public static class Vert{
-		public Vert parent;
+		public Vert parent= this;
 		public int val;
 		public int rank= 0;
 		public Vert(int val){
 			this.val = val;
-			this.parent = this;
+			//this.parent = this;
 			
 		}
 		public Vert(int val, Vert parent){
