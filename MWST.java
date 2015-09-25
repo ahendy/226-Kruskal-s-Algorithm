@@ -37,7 +37,7 @@ import java.util.Vector;
 import java.io.File;
 
 //Do not change the name of the MWST class
-public class MWST2{
+public class MWST{
 
 	/* mwst(G)
 		Given an adjacency matrix for graph G, return the total weight
@@ -48,14 +48,14 @@ public class MWST2{
 		value of G[i][j] gives the weight of the edge.
 		No entries of G will be negative.
 	*/
-	public static Vert[] ref;
-
+	
 	static int MWST(int[][] G){
 		int numVerts = G.length;
 		ListNode toSort = new ListNode(new Edge(0,0,0,new Vert[numVerts]) );
 		ListNode p = toSort;;
 		int totalWeight = 0;
-		ref = new Vert[numVerts];
+		Vert[] ref = new Vert[numVerts];
+		
 		for(int i = 0;i<numVerts;i++){
 			ref[i] = new Vert(i);
 
@@ -78,33 +78,30 @@ public class MWST2{
 		}
 		
 		
-	 	toSort = removeFront(toSort);	
+	 	toSort = removeFront(toSort);	//removes extra object on listnode, was unpreventable
 		
 		ListNode sorted = MergeSort(toSort); //sort 
 		
 		//printList(sorted);
 		//sorted now contains a  sorted ListNode of edge objects.
-	ListNode sorted2 = sorted;
+		ListNode sorted2 = sorted;
 	
-	while(sorted!= null){
-		Edge a = sorted.value;
-		int leastEdge = a.weight;
-		sorted = sorted.next;
+
+
 	
-	
-		totalWeight+= union(findSet(a.x),findSet(a.y),leastEdge); 
-		}
-		return totalWeight;
+		while(sorted!= null){ //traverse through sorted nodes
+			Edge a = sorted.value;
+			int leastEdge = a.weight;
+			sorted = sorted.next;
 		
-	}
-
-	public static boolean cycleTest(Edge a){
-		if(findSet(a.x)!=findSet(a.y)){
-			
-			return false;
-
+		
+			totalWeight+= union(findSet(a.x),findSet(a.y),leastEdge); 
 		}
-		return true;
+		
+
+		return totalWeight;
+			
+		
 
 
 
@@ -112,42 +109,41 @@ public class MWST2{
 
 	public static Vert findSet(Vert a){
 		if(a.parent != a){
-			a.parent = findSet(a.parent);
-		}
+			a.parent = findSet(a.parent); //sets parent to whatever highest parent on tree is
+		}								// uses tree compression for faster speed 
 
 		return a.parent;
 
 
 	}
 	public static int union(Vert a, Vert b, int leastEdge){
-		//Vert a = 
-		//Vert b = findSet(yr);
+		
 		//System.out.println("(a.val,a.parent.val), ("+a.val+", "+ a.parent.val+ ")....(b.val,b.parent.val), ("+ b.val +","+b.parent.val+")\n");
 
-		if(a==b){
-			//System.out.println("test");
-			return 0;
+		if(a==b){ //case that a cycle will exist, unnessecary to have cycletest branch
+			
+			return 0; //totalweight += 0
 			
 		}
-		else if(a.rank>b.rank){
+		else if(a.rank>b.rank){						//use Union
 			b.parent = a;
-			//System.out.println("b.val: "+b.val);
+			
 			
 		} else if (a.rank<b.rank){
 			a.parent = b;
-			//System.out.println("a.parent = b");
+			
 
 
 		}else if (a.rank == b.rank){
 			a.parent = b;
 			b.rank ++;
-			//System.out.println("a.rank: " + a.rank+ "b.rank: " + b.rank);
+			
 
 		}
 
 		
 		//System.out.println("Union: (a.val,a.parent.val), ("+a.val+", "+ a.parent.val+ ")....(b.val,b.parent.val), ("+ b.val +","+b.parent.val+")\n");
-		//a.parent = b;
+		
 		return leastEdge;
 
 		
@@ -190,7 +186,7 @@ public class MWST2{
 
 		}
 		return sorted;
-		//rfeturn addBack(head.next, value);
+		
 
 	}
 
@@ -222,12 +218,6 @@ public class MWST2{
 		ListNode left =  MergeSort(head); //recursively create lists of size one
 		ListNode right = MergeSort(tail); //by continuously splitting in half by findMid
 
-
-
-		//addBack(head,end);
-
-		//addBack(head, end); //addback WORKS
-		//return end;
 		return addBack(left,right);   //originally was listMerge, edited my add to back function to create a sort and merge function
 	}
 	
