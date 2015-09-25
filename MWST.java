@@ -37,7 +37,7 @@ import java.util.Vector;
 import java.io.File;
 
 //Do not change the name of the MWST class
-public class MWST{
+public class MWST2{
 
 	/* mwst(G)
 		Given an adjacency matrix for graph G, return the total weight
@@ -48,14 +48,18 @@ public class MWST{
 		value of G[i][j] gives the weight of the edge.
 		No entries of G will be negative.
 	*/
+	public static Vert[] ref;
+
 	static int MWST(int[][] G){
 		int numVerts = G.length;
-		ListNode toSort = new ListNode(new Edge(0,0,0));
+		ListNode toSort = new ListNode(new Edge(0,0,0,new Vert[numVerts]) );
 		ListNode p = toSort;;
 		int totalWeight = 0;
-		
+		ref = new Vert[numVerts];
+		for(int i = 0;i<numVerts;i++){
+			ref[i] = new Vert(i);
 
-		int sum=0;
+		}
 
 		int count2 = 0; //save pos for diagonal traversal
 		for(int row = 0; row <numVerts;row++){
@@ -63,7 +67,7 @@ public class MWST{
 			for(int column=count2; column< numVerts;column++){
 				
 				if(G[row][column]>0){
-					p.next = new ListNode(new Edge(row,column, G[row][column]));		//push to ListNode
+					p.next = new ListNode(new Edge(row,column, G[row][column],ref));		//push to ListNode
 					p = p.next;
 					
 				}
@@ -73,66 +77,27 @@ public class MWST{
 			
 		}
 		
-		System.out.println("sum: " +sum);
-		//toSort = toSort.nexxt; //bad code but couldnt figure out how to go around
-		//f = null; // other than removing first node created from toSort = newListNode(0)
-		//for(UFDS a: ufds){
-			//System.out.print("("+ a.x +", "+ a.y+") Weight: " +a.weight);
-
-
-		//}
+		
 	 	toSort = removeFront(toSort);	
-		//
-
+		
 		ListNode sorted = MergeSort(toSort); //sort 
 		
-		printList(sorted);
+		//printList(sorted);
 		//sorted now contains a  sorted ListNode of edge objects.
 	ListNode sorted2 = sorted;
 	
 	while(sorted!= null){
 		Edge a = sorted.value;
 		int leastEdge = a.weight;
-		//System.out.println("least edge: "+ leastEdge);
-		//System.out.print(" "+ edgeVec.size()+" "+ listLength(sorted));
-		//printList(sorted);
-		//sorted = removeFront(sorted);
 		sorted = sorted.next;
-		//for(Edge a: edgeVec){
-			//if(a.weight == leastEdge){
-				//a.visited = true;
-				//edgeVec.remove(a);
-		//if(!cycleTest(a)){
-			
-			//System.out.println(a.x.val);
-			//System.out.println("a.parent.valTWO: "+ a.x.parent.val+ " b.parent.valTWO "+ a.y.parent.val+"\n");
-
-		totalWeight+= union(a.x,a.y,leastEdge); 
-		System.out.println("a.x.parent.val"+ findSet(a.x).parent.val);
-		//}
-	//	System.out.println(totalWeight);	//break;
 	
-		//System.out.println("before2 "+ findSet(a.x).parent.val);
-		
-		
-		//findSet(a.x).parent = new Vert(69999);
-		//System.out.println(findSet(a.x).val+ " after2 "+findSet(a.x).parent.val);
-
-			//}
-
-
-
-
-		//}
-
-	}
 	
-
-
-		
+		totalWeight+= union(findSet(a.x),findSet(a.y),leastEdge); 
+		}
 		return totalWeight;
 		
 	}
+
 	public static boolean cycleTest(Edge a){
 		if(findSet(a.x)!=findSet(a.y)){
 			
@@ -147,65 +112,47 @@ public class MWST{
 
 	public static Vert findSet(Vert a){
 		if(a.parent != a){
-			//System.out.println("parent: "+a.parent.val +" current: "+ a.val +" ");
-			
 			a.parent = findSet(a.parent);
-			System.out.print(a.val+ " ");
 		}
 
 		return a.parent;
 
 
 	}
-	public static int union(Vert xr, Vert yr, int leastEdge){
-		Vert a = findSet(xr);
-		Vert b = findSet(yr);
-		Vert c = new Vert(69);
-	/*	if(a.val==3){
-			
+	public static int union(Vert a, Vert b, int leastEdge){
+		//Vert a = 
+		//Vert b = findSet(yr);
+		//System.out.println("(a.val,a.parent.val), ("+a.val+", "+ a.parent.val+ ")....(b.val,b.parent.val), ("+ b.val +","+b.parent.val+")\n");
+
+		if(a==b){
+			//System.out.println("test");
+			return 0;
 			
 		}
 		else if(a.rank>b.rank){
 			b.parent = a;
-			System.out.println("b.val: "+b.val);
+			//System.out.println("b.val: "+b.val);
 			
 		} else if (a.rank<b.rank){
 			a.parent = b;
+			//System.out.println("a.parent = b");
 
 
 		}else if (a.rank == b.rank){
 			a.parent = b;
 			b.rank ++;
+			//System.out.println("a.rank: " + a.rank+ "b.rank: " + b.rank);
 
 		}
 
-	*/	
-		System.out.println("a.val: "+a.val+" a.parent.val: "+ a.parent.parent.val+ " b.parent.val "+ b.parent.val +"\n");
-		a.parent = b;
 		
+		//System.out.println("Union: (a.val,a.parent.val), ("+a.val+", "+ a.parent.val+ ")....(b.val,b.parent.val), ("+ b.val +","+b.parent.val+")\n");
+		//a.parent = b;
 		return leastEdge;
 
 		
 	}
 
-	
-
-	/*public static boolean cycleTest(UFDS t){ //true if cycle false if no cycle
-		if(t.forest.contains(t.x) && t.forest.contains(t.y)){
-			return true;
-
-		}if(!t.forest.contains(t.x)) {
-				t.forest.add(t.x);
-				System.out.println("adding t.x: "+ t.x);
-
-		}if(!t.forest.contains(t.y)){
-				t.forest.add(t.y);
-				System.out.println("adding t.y: "+ t.y);	
-		}
-				
-		return false;		
-
-	}*/
 
 	public static ListNode removeFront(ListNode head){
 		ListNode f = head;
@@ -318,10 +265,10 @@ public class MWST{
 		public Vert y;
 		public int weight;
 		//public boolean visited = false;
-		public Edge(int a,int b,int weight){
+		public Edge(int a,int b,int weight, Vert[] ref){
 			this.weight = weight;
-			this.x = new Vert(a);
-			this.y = new Vert(b);
+			this.x = ref[a];
+			this.y = ref[b];
 
 			
 		}
@@ -329,12 +276,12 @@ public class MWST{
 	}
 
 	public static class Vert{
-		public Vert parent= this;
+		public Vert parent;
 		public int val;
 		public int rank= 0;
 		public Vert(int val){
 			this.val = val;
-			//this.parent = this;
+			this.parent = this;
 			
 		}
 		public Vert(int val, Vert parent){
