@@ -71,10 +71,7 @@ public class MWST{
 					p = p.next;
 					
 				}
-				
 			}
-			
-			
 		}
 		
 		
@@ -86,24 +83,13 @@ public class MWST{
 		//sorted now contains a  sorted ListNode of edge objects.
 		ListNode sorted2 = sorted;
 	
-
-
-	
 		while(sorted!= null){ //traverse through sorted nodes
 			Edge a = sorted.value;
 			int leastEdge = a.weight;
 			sorted = sorted.next;
-		
-		
 			totalWeight+= union(findSet(a.x),findSet(a.y),leastEdge); 
 		}
-		
-
 		return totalWeight;
-			
-		
-
-
 
 	}
 
@@ -116,39 +102,29 @@ public class MWST{
 
 
 	}
+	
 	public static int union(Vert a, Vert b, int leastEdge){
 		
 		//System.out.println("(a.val,a.parent.val), ("+a.val+", "+ a.parent.val+ ")....(b.val,b.parent.val), ("+ b.val +","+b.parent.val+")\n");
 
 		if(a==b){ //case that a cycle will exist, unnessecary to have cycletest branch
-			
 			return 0; //totalweight += 0
-			
 		}
 		else if(a.rank>b.rank){						//use Union
 			b.parent = a;
 			
-			
 		} else if (a.rank<b.rank){
 			a.parent = b;
-			
-
 
 		}else if (a.rank == b.rank){
 			a.parent = b;
 			b.rank ++;
-			
-
 		}
-
-		
-		//System.out.println("Union: (a.val,a.parent.val), ("+a.val+", "+ a.parent.val+ ")....(b.val,b.parent.val), ("+ b.val +","+b.parent.val+")\n");
 		
 		return leastEdge;
 
 		
 	}
-
 
 	public static ListNode removeFront(ListNode head){
 		ListNode f = head;
@@ -176,25 +152,17 @@ public class MWST{
 		}
 		if ( head.value.weight< value.value.weight){
 			sorted = new ListNode( head.value, addBack(head.next,value));
-			//sorted.next = addBack(head.next, value);
-			//return sorted;
 		}
 		else{
 			sorted = new ListNode( value.value, addBack(head,value.next));
-			//sorted.next = addBack(head,value.next);
-			//return sorted;
-
 		}
 		return sorted;
-		
 
 	}
 
-
 	public static ListNode findMid(ListNode head,ListNode end){
 		ListNode mid = head;
-		
-		
+
 		if (end == null||end.next == null||end.next.next==null){ //end.next.next is required or else null pointers would happen on a few cases.
 			return mid;														// also size n  = 4, middle pointer would be too far.
 		}
@@ -204,13 +172,9 @@ public class MWST{
 	}
 
 	public static ListNode MergeSort(ListNode head){
-		
-
 		if(listLength(head)<=1 || head ==null ){
-
 			return head;
 		}
-		
 		ListNode middle = findMid(head,head); 
 		ListNode tail = middle.next; //break from middle pointer.next to make tail		
 		middle.next = null; //middle pointer edits head linked list, breaking it into head nodes
@@ -221,10 +185,6 @@ public class MWST{
 		return addBack(left,right);   //originally was listMerge, edited my add to back function to create a sort and merge function
 	}
 	
-
-
-
-
 	public static void printList(ListNode node){
 		if (node == null)
 			System.out.println();
@@ -233,6 +193,7 @@ public class MWST{
 			printList(node.next);
 		}
 	}
+
 	public static class ListNode{
 		Edge value;
 		ListNode next;
